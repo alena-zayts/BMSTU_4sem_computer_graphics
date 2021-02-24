@@ -36,7 +36,7 @@
     <property name="geometry">
      <rect>
       <x>20</x>
-      <y>130</y>
+      <y>190</y>
       <width>41</width>
       <height>41</height>
      </rect>
@@ -54,7 +54,7 @@
     <property name="geometry">
      <rect>
       <x>20</x>
-      <y>70</y>
+      <y>130</y>
       <width>41</width>
       <height>41</height>
      </rect>
@@ -78,7 +78,7 @@
     <property name="geometry">
      <rect>
       <x>60</x>
-      <y>70</y>
+      <y>130</y>
       <width>131</width>
       <height>41</height>
      </rect>
@@ -96,7 +96,7 @@
     <property name="geometry">
      <rect>
       <x>30</x>
-      <y>200</y>
+      <y>260</y>
       <width>221</width>
       <height>61</height>
      </rect>
@@ -124,7 +124,7 @@
     <property name="geometry">
      <rect>
       <x>60</x>
-      <y>130</y>
+      <y>190</y>
       <width>131</width>
       <height>41</height>
      </rect>
@@ -142,7 +142,7 @@
     <property name="geometry">
      <rect>
       <x>20</x>
-      <y>690</y>
+      <y>820</y>
       <width>271</width>
       <height>51</height>
      </rect>
@@ -160,8 +160,8 @@
     <property name="geometry">
      <rect>
       <x>20</x>
-      <y>410</y>
-      <width>41</width>
+      <y>480</y>
+      <width>51</width>
       <height>41</height>
      </rect>
     </property>
@@ -184,7 +184,7 @@
     <property name="geometry">
      <rect>
       <x>80</x>
-      <y>410</y>
+      <y>480</y>
       <width>131</width>
       <height>41</height>
      </rect>
@@ -202,8 +202,8 @@
     <property name="geometry">
      <rect>
       <x>20</x>
-      <y>480</y>
-      <width>41</width>
+      <y>550</y>
+      <width>51</width>
       <height>41</height>
      </rect>
     </property>
@@ -226,7 +226,7 @@
     <property name="geometry">
      <rect>
       <x>80</x>
-      <y>480</y>
+      <y>550</y>
       <width>131</width>
       <height>41</height>
      </rect>
@@ -244,7 +244,7 @@
     <property name="geometry">
      <rect>
       <x>20</x>
-      <y>550</y>
+      <y>680</y>
       <width>41</width>
       <height>41</height>
      </rect>
@@ -268,7 +268,7 @@
     <property name="geometry">
      <rect>
       <x>80</x>
-      <y>550</y>
+      <y>680</y>
       <width>131</width>
       <height>41</height>
      </rect>
@@ -286,7 +286,7 @@
     <property name="geometry">
      <rect>
       <x>20</x>
-      <y>620</y>
+      <y>750</y>
       <width>41</width>
       <height>41</height>
      </rect>
@@ -310,7 +310,7 @@
     <property name="geometry">
      <rect>
       <x>80</x>
-      <y>620</y>
+      <y>750</y>
       <width>131</width>
       <height>41</height>
      </rect>
@@ -328,7 +328,7 @@
     <property name="geometry">
      <rect>
       <x>80</x>
-      <y>930</y>
+      <y>1090</y>
       <width>131</width>
       <height>41</height>
      </rect>
@@ -346,7 +346,7 @@
     <property name="geometry">
      <rect>
       <x>20</x>
-      <y>940</y>
+      <y>1100</y>
       <width>41</width>
       <height>31</height>
      </rect>
@@ -370,7 +370,7 @@
     <property name="geometry">
      <rect>
       <x>80</x>
-      <y>1020</y>
+      <y>1220</y>
       <width>131</width>
       <height>41</height>
      </rect>
@@ -388,7 +388,7 @@
     <property name="geometry">
      <rect>
       <x>20</x>
-      <y>1030</y>
+      <y>1230</y>
       <width>41</width>
       <height>31</height>
      </rect>
@@ -405,14 +405,14 @@
      </font>
     </property>
     <property name="text">
-     <string>θ</string>
+     <string>θ:</string>
     </property>
    </widget>
    <widget class="QPushButton" name="bt_turn">
     <property name="geometry">
      <rect>
       <x>30</x>
-      <y>1110</y>
+      <y>1310</y>
       <width>261</width>
       <height>61</height>
      </rect>
@@ -430,7 +430,7 @@
     <property name="geometry">
      <rect>
       <x>20</x>
-      <y>850</y>
+      <y>1020</y>
       <width>41</width>
       <height>31</height>
      </rect>
@@ -454,7 +454,7 @@
     <property name="geometry">
      <rect>
       <x>80</x>
-      <y>840</y>
+      <y>1010</y>
       <width>131</width>
       <height>41</height>
      </rect>
@@ -474,7 +474,7 @@
       <x>10</x>
       <y>20</y>
       <width>281</width>
-      <height>261</height>
+      <height>321</height>
      </rect>
     </property>
     <property name="font">
@@ -485,14 +485,32 @@
     <property name="title">
      <string>Перенос</string>
     </property>
+    <widget class="QLabel" name="label_2">
+     <property name="geometry">
+      <rect>
+       <x>10</x>
+       <y>40</y>
+       <width>261</width>
+       <height>41</height>
+      </rect>
+     </property>
+     <property name="font">
+      <font>
+       <pointsize>9</pointsize>
+      </font>
+     </property>
+     <property name="text">
+      <string>Величины смещения</string>
+     </property>
+    </widget>
    </widget>
    <widget class="QGroupBox" name="groupBox_2">
     <property name="geometry">
      <rect>
       <x>10</x>
-      <y>340</y>
+      <y>380</y>
       <width>291</width>
-      <height>421</height>
+      <height>511</height>
      </rect>
     </property>
     <property name="font">
@@ -503,14 +521,50 @@
     <property name="title">
      <string>Масштабирование</string>
     </property>
+    <widget class="QLabel" name="label_3">
+     <property name="geometry">
+      <rect>
+       <x>10</x>
+       <y>40</y>
+       <width>261</width>
+       <height>41</height>
+      </rect>
+     </property>
+     <property name="font">
+      <font>
+       <pointsize>9</pointsize>
+      </font>
+     </property>
+     <property name="text">
+      <string>Центр</string>
+     </property>
+    </widget>
+    <widget class="QLabel" name="label_4">
+     <property name="geometry">
+      <rect>
+       <x>10</x>
+       <y>240</y>
+       <width>261</width>
+       <height>41</height>
+      </rect>
+     </property>
+     <property name="font">
+      <font>
+       <pointsize>9</pointsize>
+      </font>
+     </property>
+     <property name="text">
+      <string>Коэффициенты</string>
+     </property>
+    </widget>
    </widget>
    <widget class="QGroupBox" name="groupBox_3">
     <property name="geometry">
      <rect>
       <x>10</x>
-      <y>800</y>
+      <y>920</y>
       <width>291</width>
-      <height>401</height>
+      <height>461</height>
      </rect>
     </property>
     <property name="font">
@@ -521,12 +575,48 @@
     <property name="title">
      <string>Поворот</string>
     </property>
+    <widget class="QLabel" name="label_5">
+     <property name="geometry">
+      <rect>
+       <x>10</x>
+       <y>40</y>
+       <width>261</width>
+       <height>41</height>
+      </rect>
+     </property>
+     <property name="font">
+      <font>
+       <pointsize>9</pointsize>
+      </font>
+     </property>
+     <property name="text">
+      <string>Центр</string>
+     </property>
+    </widget>
+    <widget class="QLabel" name="label_6">
+     <property name="geometry">
+      <rect>
+       <x>10</x>
+       <y>240</y>
+       <width>261</width>
+       <height>41</height>
+      </rect>
+     </property>
+     <property name="font">
+      <font>
+       <pointsize>9</pointsize>
+      </font>
+     </property>
+     <property name="text">
+      <string>Угол</string>
+     </property>
+    </widget>
    </widget>
    <widget class="QPushButton" name="bt_again">
     <property name="geometry">
      <rect>
-      <x>310</x>
-      <y>1260</y>
+      <x>370</x>
+      <y>1160</y>
       <width>401</width>
       <height>91</height>
      </rect>
@@ -543,8 +633,8 @@
    <widget class="QPushButton" name="bt_back">
     <property name="geometry">
      <rect>
-      <x>800</x>
-      <y>1260</y>
+      <x>860</x>
+      <y>1160</y>
       <width>211</width>
       <height>91</height>
      </rect>
@@ -561,8 +651,8 @@
    <widget class="QGroupBox" name="groupBox_4">
     <property name="geometry">
      <rect>
-      <x>1110</x>
-      <y>1180</y>
+      <x>1170</x>
+      <y>1160</y>
       <width>291</width>
       <height>181</height>
      </rect>
@@ -675,6 +765,27 @@
      </property>
     </widget>
    </widget>
+   <widget class="QLabel" name="label">
+    <property name="geometry">
+     <rect>
+      <x>1480</x>
+      <y>1160</y>
+      <width>611</width>
+      <height>151</height>
+     </rect>
+    </property>
+    <property name="font">
+     <font>
+      <pointsize>9</pointsize>
+     </font>
+    </property>
+    <property name="text">
+     <string>Величины смещения, а также центры масштабирования и поворота указываются в пикселях. Угол поворота - в градусах. На рисунке проведены оси OX и OY с засечками каждые 100 пикселей. </string>
+    </property>
+    <property name="wordWrap">
+     <bool>true</bool>
+    </property>
+   </widget>
    <zorder>groupBox</zorder>
    <zorder>groupBox_3</zorder>
    <zorder>groupBox_2</zorder>
@@ -703,6 +814,7 @@
    <zorder>bt_again</zorder>
    <zorder>bt_back</zorder>
    <zorder>groupBox_4</zorder>
+   <zorder>label</zorder>
   </widget>
  </widget>
  <resources/>
