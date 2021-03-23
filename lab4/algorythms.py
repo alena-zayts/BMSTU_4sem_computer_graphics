@@ -4,7 +4,7 @@ import numpy as np
 
 # симметричное отражение 1/8 плоскости
 def mirror_8(dots, xc, yc, color, x, y):
-    dots.append([
+    dots.extend([
         [x, y, color],
         [xc - (x - xc), y, color],
         [x, yc - (y - yc), color],
@@ -18,7 +18,7 @@ def mirror_8(dots, xc, yc, color, x, y):
 
 # симметричное отражение 1/4 плоскости
 def mirror_4(dots, xc, yc, color, x, y):
-    dots.append([
+    dots.extend([
         [x, y, color],
         [xc - (x - xc), y, color],
         [x, yc - (y - yc), color],
@@ -187,6 +187,59 @@ def ellipse_parametric(xc, yc, a, b, color):
     return dots
 
 
+# построение эллипса по алгоритму Брезенхема
+# строится эллипс с центром в (0, 0),
+# а в массив записываются координаты с учетом смещения на (xc, yc)
+def ellipse_brezenham(xc, yc, a, b, color):
+    dots = []
+    a_sqr = a * a
+    b_sqr = b * b
+
+    # начальные значения
+    x = 0
+    y = round(b)
+    # разность квадратов расстояний от центра эллипса до диагонального
+    # (xi + 1,yi - 1) пикселя и до идеального эллипса
+    delta = b_sqr - a_sqr * (2 * b - 1) ## в конце +
+
+    mirror_4(dots, xc, yc, color, x + xc, y + yc)
+
+    # строим 1/4 эллипса
+    while y > 0:
+        # горизонтальный или диагональный (1, 2, 5 случаи)
+        if delta <= 0:
+            # смещаемся вправо
+            delta_temp = 2 * delta + a_sqr * (2 * y - 1)
+            x += 1
+
+            # диагональный
+            if delta_temp >= 0:
+                # смещаемся вниз
+                y -= 1
+                delta += 2 * (b_sqr * x - a_sqr * y) + b_sqr + a_sqr
+            # горизонтальный
+            else:
+                delta += b_sqr * 2 * x + b_sqr
+        # вертикальный или диагональный (3 и 4 случаи)
+        else:
+            # смещаемся вниз
+            delta_temp = 2 * delta + b_sqr * (-2 * x - 1)
+            y -= 1
+            # диагональный
+            if delta_temp < 0:
+                # смещаемся вправо
+                x += 1
+                delta += 2 * (b_sqr * x - a_sqr * y) + b_sqr + a_sqr
+            # вертикальный
+            else:
+                delta += -a_sqr * 2 * y + a_sqr
+
+        # отражаем относительно ox и oy
+        mirror_4(dots, xc, yc, color, x + xc, y + yc)
+
+    return dots
+
+
 # построение эллипса по алгоритму средней точки
 # строится эллипс с центром в (0, 0),
 # а в массив записываются координаты с учетом смещения на (xc, yc)
@@ -242,27 +295,9 @@ def ellipse_midpoint(xc, yc, a, b, color):
     return dots
 
 
-def change_color_intensity(color, intensity):
-    return tuple(((1 - intensity) * 255) if elem != 255 else 255
-                 for elem in color)
+def circle_lib(xc, yc, r, color):
+    return ['lib', xc - r, yc - r, 2 * r, 2 * r, color]
 
 
-# цифровой дифференциальный анализатор
-def dda(xn, yn, xk, yk, color):
-    if abs(xk - xn) > abs(yk - yn):
-        length = abs(xk - xn)
-    else:
-        length = abs(yk - yn)
-
-    dx = (xk - xn) / length
-    dy = (yk - yn) / length
-
-    # начало основного цикла
-    x = xn
-    y = yn
-    dots = []
-    for i in range(round(length) + 1):
-        dots.append([round(x), round(y), color])
-        x = x + dx
-        y = y + dy
-
+def ellipse_lib(xc, yc, a, b, color):
+    return ['lib', xc - a, yc - b, 2 * a, 2 * b, color]
