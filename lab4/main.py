@@ -10,6 +10,7 @@ from algorythms import *  # реалмзованные алгоритмы
 
 EPS = 1e-6
 
+
 def find_color_code(color_name):
     if color_name == 'Цвет фона':
         return tuple([255, 255, 255])
@@ -63,7 +64,7 @@ class MyWindow(QtWidgets.QMainWindow, design.Ui_MainWindow):
         self.but_circle.clicked.connect(self.on_bt_circle_clicked)
         self.but_circles.clicked.connect(self.on_bt_circles_clicked)
         self.but_ellipse.clicked.connect(self.on_bt_ellipse_clicked)
-        #self.but_ellipses.clicked.connect(self.on_bt_ellipses_clicked)
+        self.but_ellipses.clicked.connect(self.on_bt_ellipses_clicked)
         self.but_time.clicked.connect(self.on_bt_time_clicked)
         self.but_axes.clicked.connect(self.on_bt_axes_clicked)
         self.but_clean.clicked.connect(self.on_bt_clean_clicked)
@@ -164,7 +165,6 @@ class MyWindow(QtWidgets.QMainWindow, design.Ui_MainWindow):
             step = self.box_c_step.value()
             rbeg = rend - step * (n - 1)
 
-
         # обработка данных
         color_code = find_color_code(color_name)
         alg_func = choose_circle_function(alg_name)
@@ -183,100 +183,45 @@ class MyWindow(QtWidgets.QMainWindow, design.Ui_MainWindow):
         # отрисовка
         self.draw_all()
 
-    def count_time_circle_lib(self, n_repeats, r):
-        scene = QtWidgets.QGraphicsScene()
-        self.graph.setScene(scene)
-        w = self.graph.width()
-        h = self.graph.height()
-        border = 5
-        scene.setSceneRect(-w / 2, -h / 2, w - border, h - border)
+    def on_bt_ellipses_clicked(self):
+        # получение данных
+        alg_name = self.box_alg.currentText()
+        color_name = self.box_color.currentText()
+        xc = self.box_e_xc.value()
+        yc = self.box_e_yc.value()
+        a_beg = self.box_e_a.value()
+        b_beg = self.box_e_b.value()
+        params = self.box_e_param.currentIndex()
+        if params == 0:
+            a_step = self.box_e_step.value()
+            a_n = int(self.box_e_n.value())
+            a_end = a_beg + a_step * (a_n - 1)
+            a_list = np.linspace(a_beg, a_end, a_n)
+            b_list = np.linspace(b_beg, b_beg, a_n)
 
-        x, y = -r, -r
-        cw = 2 * r
-        ch = 2 * r
-        color_code = tuple([0, 0, 0])
-        width = 1
+        elif params == 1:
+            b_step = self.box_e_step.value()
+            b_n = int(self.box_e_n.value())
+            b_end = b_beg + b_step * (b_n - 1)
+            a_list = np.linspace(a_beg, a_beg, b_n)
+            b_list = np.linspace(b_beg, b_end, b_n)
 
-        total_sum = 0
-        for _ in range(n_repeats):
-            start = time()
-            scene.addEllipse(x, y, cw, ch,
-                             pen=pg.mkPen(color=color_code, width=width))
-            end = time()
-            total_sum += (end - start)
+        # обработка данных
+        color_code = find_color_code(color_name)
+        alg_func = choose_ellipse_function(alg_name)
 
-        self.figures = []
+        # проверка на вырожденность
+        if (a_beg < 1) and (b_beg < 1):
+            self.handle_error('Предупреждение',
+                              'Начальный эллипс в пикселях представляется одной точкой.')
+            dots = [[round(xc), round(yc), color_code]]
+            self.figures.append(dots)
+        for a, b in list(zip(a_list, b_list)):
+            dots = alg_func([xc, yc, a, b, color_code])
+            self.figures.append(dots)
+
+        # отрисовка
         self.draw_all()
-        return total_sum
-
-    def count_time_circle_alg(self, alg_func, n_repeats, r):
-        color_code = tuple([0, 0, 0])
-
-        total_sum = 0
-        for _ in range(n_repeats):
-            start = time()
-            alg_func([0, 0, r, color_code])
-            end = time()
-            total_sum += (end - start)
-
-        return total_sum
-
-    def count_times_circles(self, n_repeats, r_start, r_stop, r_step):
-        alg_names = ['Каноническое уравение', 'Параметрическое уравнение', 'Алгоритм Брезенхема',
-                     'Алгоритм средней точки']
-        times = []
-        for alg_name in alg_names:
-            times_cur = []
-            alg_func = choose_circle_function(alg_name)
-            for r in range(r_start, r_stop, r_step):
-                times_cur.append(self.count_time_circle_alg(alg_func, n_repeats, r))
-            times.append(times_cur)
-
-        alg_names.append('Библиотечная функция')
-        times_cur = []
-        for r in range(r_start, r_stop, r_step):
-            times_cur.append(self.count_time_circle_lib(n_repeats, r))
-        times.append(times_cur)
-
-        return alg_names, times
-
-
-    def on_bt_time_clicked(self):
-        n_repeats = 50
-        r_start, r_stop, r_step = 100, 501, 100
-        rs = [100, 200, 300, 400, 500]
-        alg_names, times = self.count_times_circles(n_repeats, r_start, r_stop, r_step)
-        plt.figure(figsize=(25, 10))
-        plt.rcParams['font.size'] = '16'
-        plt.xlabel('Алгоритм')
-        plt.ylabel('Время, c')
-        plt.title('Время, затраченное на построение %d окружностей с центром в\n '
-                  'точке (0, 0) в зависимости от радиуса'
-                  % n_repeats)
-        for i in range(len(alg_names)):
-            alg_name = alg_names[i]
-            time = times[i]
-            plt.plot(rs, time, label=alg_name)
-        plt.legend(loc='best')
-        plt.show()
-    #
-    # def on_bt_step_clicked(self):
-    #     length = 1000
-    #     alg_names, steps_total = self.count_steps_in_algs(length)
-    #
-    #     plt.figure(figsize=(25, 10))
-    #     plt.rcParams['font.size'] = '16'
-    #     plt.xlabel('Угол наклона, °')
-    #     plt.xticks(np.arange(0, 361, 15, dtype='int64'))
-    #     plt.ylabel('Количество ступенек')
-    #     plt.title('График зависимости количества ступенек от\n'
-    #               'угла наклона отрезка длины %d' % length)
-    #     angles = np.arange(0, 360, 1, dtype='int64')
-    #     for i in range(6):
-    #         plt.plot(angles, steps_total[i], label=alg_names[i])
-    #     plt.legend()
-    #     plt.xlim([0, 90])
-    #     plt.show()
 
     def on_bt_axes_clicked(self):
         self.axes_flag = not self.axes_flag
@@ -360,55 +305,159 @@ class MyWindow(QtWidgets.QMainWindow, design.Ui_MainWindow):
                 text.update()
                 scene.addItem(text)
 
+    def count_time_circle_lib(self, n_repeats, r):
+        scene = QtWidgets.QGraphicsScene()
+        self.graph.setScene(scene)
+        w = self.graph.width()
+        h = self.graph.height()
+        border = 5
+        scene.setSceneRect(-w / 2, -h / 2, w - border, h - border)
 
+        x, y = -r, -r
+        cw = 2 * r
+        ch = 2 * r
+        color_code = tuple([0, 0, 0])
+        width = 1
 
+        total_sum = 0
+        for _ in range(n_repeats):
+            start = time()
+            scene.addEllipse(x, y, cw, ch,
+                             pen=pg.mkPen(color=color_code, width=width))
+            end = time()
+            total_sum += (end - start)
 
+        self.figures = []
+        self.draw_all()
+        return total_sum
 
-    def count_steps_in_line(self, line):
-        min_x = min(line[0][0], line[-1][0])
-        max_x = max(line[0][0], line[-1][0])
-        min_y = min(line[0][1], line[-1][1])
-        max_y = max(line[0][1], line[-1][1])
-        dx = max_x - min_x
-        dy = max_y - min_y
+    def count_time_circle_alg(self, alg_func, n_repeats, r):
+        color_code = tuple([0, 0, 0])
 
-        return min(dx, dy)
+        total_sum = 0
+        for _ in range(n_repeats):
+            start = time()
+            alg_func([0, 0, r, color_code])
+            end = time()
+            total_sum += (end - start)
 
-    def count_steps_in_spector(self, alg_func, length):
-        xn = 0
-        yn = 0
-        step = radians(1)
-        color_code = (0, 0, 0)
-        angle = 0
-        steps_amount = []
-        while 2 * pi - angle > EPS:
-            xk = xn + length * cos(angle)
-            yk = yn + length * sin(angle)
-            # построение отрезка по выбранному алгоритму
-            line = alg_func([xn, yn, xk, yk, color_code])
-            steps_amount.append(self.count_steps_in_line(line))
-            angle += step
-        return steps_amount
+        return total_sum
 
-    def count_steps_in_algs(self, length):
-        alg_names = ['ЦДА', 'Брезенхем (действ.)', 'Брезенхем (цел.)',
-                     'Брезенхем (устр. ступенч.)', 'Ву']
-        stpes_total = []
+    def count_times_circles(self, n_repeats, r_start, r_stop, r_step):
+        alg_names = ['Каноническое уравнение', 'Параметрическое уравнение', 'Алгоритм Брезенхема',
+                     'Алгоритм средней точки']
+        times = []
         for alg_name in alg_names:
-            alg_func = choose_function(alg_name)
-            stpes_total.append(self.count_steps_in_spector(alg_func, length))
+            times_cur = []
+            alg_func = choose_circle_function(alg_name)
+            for r in range(r_start, r_stop, r_step):
+                times_cur.append(self.count_time_circle_alg(alg_func, n_repeats, r))
+            times.append(times_cur)
 
-        alg_names.append('Теоретическое ожидание')
-        steps_theor = []
-        for angle in range(360):
-            sin_angle = sin(radians(angle))
-            cos_angle = cos(radians(angle))
-            dx = abs(length * cos_angle)
-            dy = abs(length * sin_angle)
-            steps_theor.append(floor(min(dx, dy)))
-        stpes_total.append(steps_theor)
+        alg_names.append('Библиотечная функция')
+        times_cur = []
+        for r in range(r_start, r_stop, r_step):
+            times_cur.append(self.count_time_circle_lib(n_repeats, r))
+        times.append(times_cur)
 
-        return alg_names, stpes_total
+        return alg_names, times
+
+    def count_time_ellipse_lib(self, n_repeats, a, b):
+        scene = QtWidgets.QGraphicsScene()
+        self.graph.setScene(scene)
+        w = self.graph.width()
+        h = self.graph.height()
+        border = 5
+        scene.setSceneRect(-w / 2, -h / 2, w - border, h - border)
+
+        x, y = -a, -b
+        ew = 2 * a
+        eh = 2 * b
+        color_code = tuple([0, 0, 0])
+        width = 1
+
+        total_sum = 0
+        for _ in range(n_repeats):
+            start = time()
+            scene.addEllipse(x, y, ew, eh,
+                             pen=pg.mkPen(color=color_code, width=width))
+            end = time()
+            total_sum += (end - start)
+
+        self.figures = []
+        self.draw_all()
+        return total_sum
+
+    def count_time_ellipse_alg(self, alg_func, n_repeats, a, b):
+        color_code = tuple([0, 0, 0])
+
+        total_sum = 0
+        for _ in range(n_repeats):
+            start = time()
+            alg_func([0, 0, a, b, color_code])
+            end = time()
+            total_sum += (end - start)
+
+        return total_sum
+
+    def count_times_ellipses(self, n_repeats, a_start, a_stop, a_step):
+        alg_names = ['Каноническое уравнение', 'Параметрическое уравнение', 'Алгоритм Брезенхема',
+                     'Алгоритм средней точки']
+        times = []
+        for alg_name in alg_names:
+            times_cur = []
+            alg_func = choose_ellipse_function(alg_name)
+            for a in range(a_start, a_stop, a_step):
+                times_cur.append(self.count_time_ellipse_alg(alg_func, n_repeats, a, a))
+            times.append(times_cur)
+
+        alg_names.append('Библиотечная функция')
+        times_cur = []
+        for r in range(a_start, a_stop, a_step):
+            times_cur.append(self.count_time_ellipse_lib(n_repeats, a, a))
+        times.append(times_cur)
+
+        return times
+
+
+    def on_bt_time_clicked(self):
+        n_repeats = 20
+        r_start, r_stop, r_step = 100, 2001, 200
+        rs = np.linspace(100, 2000, 10, dtype=int)
+        alg_names, times_circle = self.count_times_circles(n_repeats, r_start, r_stop, r_step)
+        times_ellipse = self.count_times_ellipses(n_repeats, r_start, r_stop, r_step)
+
+        plt.rcParams['font.size'] = '16'
+        fig, (ax1, ax2) = plt.subplots(
+            nrows=2, ncols=1,
+            figsize=(25, 20)
+        )
+        ax1.set_title('Время, затраченное на построение %d окружностей с центром в '
+                      'точке (0, 0) в зависимости от радиуса'
+                      % n_repeats)
+        ax1.set_xlabel('Радиус')
+        ax1.set_ylabel('Время, c')
+        ax1.grid()
+
+        for i in range(len(alg_names)):
+            alg_name = alg_names[i]
+            time = times_circle[i]
+            ax1.plot(rs, time, label=alg_name)
+        ax1.legend(loc='best')
+
+        ax2.set_title('Время, затраченное на построение %d эллипсов с центром в '
+                      'точке (0, 0) в зависимости от полуосей (a=b)'
+                      % n_repeats)
+        ax2.set_xlabel('Полуось')
+        ax2.set_ylabel('Время, c')
+        ax2.grid()
+
+        for i in range(len(alg_names)):
+            alg_name = alg_names[i]
+            time = times_ellipse[i]
+            ax2.plot(rs, time, label=alg_name)
+        ax2.legend(loc='best')
+        plt.show()
 
 def main():
     app = QtWidgets.QApplication(sys.argv)  # Новый экземпляр QApplication

@@ -74,7 +74,7 @@ def circle_brezenham(xc, yc, r, color):
     # (xi + 1,yi - 1) пикселя и до идеальной окружности
     delta = 2 * (1 - r)
 
-    mirror_8(dots, xc, yc, color, x + xc, y + xc)
+    mirror_8(dots, xc, yc, color, x + xc, y + yc)
 
     # находим точки 1/8 части окружности
     while x < y:
@@ -103,7 +103,7 @@ def circle_brezenham(xc, yc, r, color):
             else:
                 delta -= 2 * y - 1
         # отражаем относительно ox, oy и 2 биссектрис
-        mirror_8(dots, xc, yc, color, x + xc, y + xc)
+        mirror_8(dots, xc, yc, color, x + xc, y + yc)
 
     return dots
 
