@@ -200,7 +200,7 @@ def ellipse_brezenham(xc, yc, a, b, color):
     y = round(b)
     # разность квадратов расстояний от центра эллипса до диагонального
     # (xi + 1,yi - 1) пикселя и до идеального эллипса
-    delta = b_sqr - a_sqr * (2 * b - 1) ## в конце +
+    delta = b_sqr - a_sqr * (2 * b - 1)
 
     mirror_4(dots, xc, yc, color, x + xc, y + yc)
 
