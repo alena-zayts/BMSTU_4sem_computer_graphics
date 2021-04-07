@@ -202,11 +202,8 @@ class MyWindow(QtWidgets.QMainWindow, design.Ui_MainWindow):
         t = QTime()
         pix = QPixmap()  # отрисовываемая картинка
         p = QPainter()  # отрисовщик
-        ### может не нужно
         self.draw_edges(self.edges)
-        ###
         p.begin(self.image)
-
         t.start()
         # находим абсциссу крайней правой вершины
         xm = self.find_max_x()
@@ -230,14 +227,14 @@ class MyWindow(QtWidgets.QMainWindow, design.Ui_MainWindow):
             cur_y = y1  # текущая сканирующая строка
             end_y = y2  # последняя сканирующая строка для данного ребра
             dx = (x2 - x1) / (y2 - y1)
-            start_x = x1 + 1  # первый заполняемый пиксел первой сканирущей строки
+            start_x = x1  # первый заполняемый пиксел первой сканирущей строки
 
             # в цикле по сканирующим строкам для данного ребра
-            while cur_y < end_y:
+            while cur_y <= end_y:
                 # в цикле по пикселам сканирующей строки, расположенным
                 # правее ее пересечения с ребром и левее крайней правой
                 # вершины фигуры
-                x = round(start_x + 0.5)  # первый заполняемый пиксел текущей сканирущей строки
+                x = round(start_x)  # первый заполняемый пиксел текущей сканирущей строки
                 while x < xm:
                     self.invert_pixel(p, x, cur_y)  # "дополняем" пиксел
                     p.drawPoint(x, cur_y)
@@ -266,8 +263,8 @@ class MyWindow(QtWidgets.QMainWindow, design.Ui_MainWindow):
     def draw_edges(self, edges):
         p = QPainter()
         p.begin(self.image)
-        # p.setPen(QPen(self.fill_color))
-        p.setPen(QPen(Qt.black))
+        p.setPen(QPen(self.fill_color))
+        # p.setPen(QPen(Qt.black))
         for e in edges:
             p.drawLine(e[0], e[1], e[2], e[3])
         p.end()
