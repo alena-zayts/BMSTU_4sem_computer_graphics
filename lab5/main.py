@@ -278,3 +278,5 @@ if __name__ == "__main__":
     w = MyWindow()  # Создаём объект класса ExampleApp
     w.show()  # Показываем окно
     sys.exit(app.exec_())  # и запускаем приложение
+
+
