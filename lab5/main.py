@@ -3,6 +3,7 @@ from PyQt5 import QtWidgets
 from PyQt5.QtWidgets import QTableWidgetItem
 from PyQt5.QtGui import QPen, QColor, QImage, QPixmap, QPainter
 from PyQt5.QtCore import Qt, QTime, QEventLoop, QPointF
+from brezenham_int import bresenham_int
 import sys
 
 global w
@@ -19,8 +20,6 @@ def find_color_code(color_name):
         return Qt.darkBlue
     elif color_name == 'Желтый':
         return Qt.yellow
-    elif color_name == 'Черный':
-        return Qt.black
 
 
 # для добаления точки по нажатию мышкой
@@ -55,6 +54,7 @@ class MyWindow(QtWidgets.QMainWindow, design.Ui_MainWindow):
         # цвета по умолчанию
         self.fill_color = Qt.green
         self.back_color = Qt.white
+        self.border_color = Qt.black
 
         # создание сцены
         self.scene = myScene(0, 0, 1600, 1250)
@@ -122,8 +122,10 @@ class MyWindow(QtWidgets.QMainWindow, design.Ui_MainWindow):
                                round(point.x()), round(point.y())])
             self.get_fill_color()
             # выводим ребро на экран
-            self.scene.addLine(round(self.point_prev.x()), round(self.point_prev.y()),
-                               round(point.x()), round(point.y()), self.pen)
+            self.draw_edges([[round(self.point_prev.x()), round(self.point_prev.y()),
+                             round(point.x()), round(point.y())]])
+            # self.scene.addLine(round(self.point_prev.x()), round(self.point_prev.y()),
+            #                   round(point.x()), round(point.y()), self.pen)
             self.point_prev = point
 
         # если фигура замкнулась
@@ -135,9 +137,9 @@ class MyWindow(QtWidgets.QMainWindow, design.Ui_MainWindow):
     def on_bt_connect_clicked(self):
         if not self.point_start:
             self.handle_error("Ошибка", "Контур уже замкнут")
-        elif len(self.edges) < 2 or self.on_one_line():
-            self.handle_error("Ошибка", "Сначала введите не менее двух участков контура, "
-                                        "не лежащих на одной прямой")
+        # elif len(self.edges) < 2 or self.on_one_line():
+        #     self.handle_error("Ошибка", "Сначала введите не менее двух участков контура, "
+        #                                 "не лежащих на одной прямой")
         else:
             self.add_point(self.point_start)
 
@@ -162,6 +164,7 @@ class MyWindow(QtWidgets.QMainWindow, design.Ui_MainWindow):
         if self.point_start:
             self.handle_error('Предупреждение', 'Один из контуров остался незамкнутым.')
         self.get_fill_color()
+        self.draw_edges(self.edges)
         self.fill_polygon()
 
     # настройка цвета заполнения
@@ -174,13 +177,6 @@ class MyWindow(QtWidgets.QMainWindow, design.Ui_MainWindow):
     # вывод времени
     def display_time(self, time):
         self.lbl_time.setText("Время: {0:.3f}msc".format(time))
-
-    # дополнение пикселя
-    def invert_pixel(self, p, x, y):
-        if QColor(self.image.pixel(x, y)) == self.back_color:
-            p.setPen(QPen(self.fill_color))
-        else:
-            p.setPen(QPen(self.back_color))
 
     # нахождение абсциссы крайней правой вершины
     def find_max_x(self):
@@ -195,16 +191,25 @@ class MyWindow(QtWidgets.QMainWindow, design.Ui_MainWindow):
 
         return x_max
 
+    # дополнение пикселя
+    def invert_pixel(self, p, x, y):
+        if QColor(self.image.pixel(x, y)) != self.border_color:
+            if QColor(self.image.pixel(x, y)) == self.back_color:
+                p.setPen(QPen(self.fill_color))
+            else:
+                p.setPen(QPen(self.back_color))
+        else:
+            p.setPen(QPen(self.border_color))
+
     # алгоритм заполнения "по ребрам"
     def fill_polygon(self):
         delay_flag = self.but_delay.isChecked()
-
         t = QTime()
         pix = QPixmap()  # отрисовываемая картинка
         p = QPainter()  # отрисовщик
-        self.draw_edges(self.edges)
         p.begin(self.image)
         t.start()
+
         # находим абсциссу крайней правой вершины
         xm = self.find_max_x()
 
@@ -225,12 +230,12 @@ class MyWindow(QtWidgets.QMainWindow, design.Ui_MainWindow):
                 x1, x2 = x2, x1
 
             cur_y = y1  # текущая сканирующая строка
-            end_y = y2  # последняя сканирующая строка для данного ребра
-            dx = (x2 - x1) / (y2 - y1)
-            start_x = x1  # первый заполняемый пиксел первой сканирущей строки
+            end_y = y2  # последняя сканирующая строка для данного ребра (не включается в рассмотрение)
+            dx = float(x2 - x1) / (y2 - y1)  # приращение x
+            start_x = x1 + 1  # первый заполняемый пиксел первой сканирущей строки с учетом отступа от границы
 
             # в цикле по сканирующим строкам для данного ребра
-            while cur_y <= end_y:
+            while cur_y < end_y:
                 # в цикле по пикселам сканирующей строки, расположенным
                 # правее ее пересечения с ребром и левее крайней правой
                 # вершины фигуры
@@ -238,7 +243,8 @@ class MyWindow(QtWidgets.QMainWindow, design.Ui_MainWindow):
                 while x < xm:
                     self.invert_pixel(p, x, cur_y)  # "дополняем" пиксел
                     p.drawPoint(x, cur_y)
-                    x += 1
+                    x += 1  # переходим с следующему пикселу сканирующей строки
+
                 # переходим к следующей сканирующей строке
                 cur_y += 1
                 start_x += dx
@@ -263,11 +269,16 @@ class MyWindow(QtWidgets.QMainWindow, design.Ui_MainWindow):
     def draw_edges(self, edges):
         p = QPainter()
         p.begin(self.image)
-        p.setPen(QPen(self.fill_color))
-        # p.setPen(QPen(Qt.black))
+        p.setPen(QPen(self.border_color))
         for e in edges:
-            p.drawLine(e[0], e[1], e[2], e[3])
+            points = bresenham_int(*e)
+            for point in points:
+                p.drawPoint(*point)
         p.end()
+
+        pix = QPixmap()  # отрисовываемая картинка
+        pix.convertFromImage(self.image)
+        self.scene.addPixmap(pix)
 
 
 if __name__ == "__main__":
