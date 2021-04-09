@@ -57,11 +57,11 @@ class MyWindow(QtWidgets.QMainWindow, design.Ui_MainWindow):
         self.border_color = Qt.black
 
         # создание сцены
-        self.scene = myScene(0, 0, 1600, 1250)
+        self.scene = myScene(0, 0, 1600, 1350)
         self.scene.win = self
         self.graph.setScene(self.scene)
         # изображение
-        self.image = QImage(1600, 1250, QImage.Format_ARGB32_Premultiplied)
+        self.image = QImage(1600, 1350, QImage.Format_ARGB32_Premultiplied)
         self.image.fill(self.back_color)
 
         self.edges = []  # список ребер многоугольника, ограничивающего заданную область
@@ -161,8 +161,16 @@ class MyWindow(QtWidgets.QMainWindow, design.Ui_MainWindow):
 
     # заполнение
     def on_bt_fill_clicked(self):
+        if self.edges == []:
+            self.handle_error('Ошибка', 'Введите хотя бы одно ребро')
+            return
+
         if self.point_start:
             self.handle_error('Предупреждение', 'Один из контуров остался незамкнутым.')
+
+        #self.scene.clear()
+        #self.image.fill(self.back_color)
+
         self.get_fill_color()
         self.draw_edges(self.edges)
         self.fill_polygon()
@@ -176,7 +184,7 @@ class MyWindow(QtWidgets.QMainWindow, design.Ui_MainWindow):
 
     # вывод времени
     def display_time(self, time):
-        self.lbl_time.setText("Время: {0:.3f}msc".format(time))
+        self.lbl_time.setText("Время: {0:.0f}msc".format(time))
 
     # нахождение абсциссы крайней правой вершины
     def find_max_x(self):
@@ -204,6 +212,10 @@ class MyWindow(QtWidgets.QMainWindow, design.Ui_MainWindow):
     # алгоритм заполнения "по ребрам"
     def fill_polygon(self):
         delay_flag = self.but_delay.isChecked()
+        if delay_flag:
+            delay_lvl = self.delay_lvl.maximum() - self.delay_lvl.value() + 1
+        cur_line = 0  # для отслеживания задержки
+
         t = QTime()
         pix = QPixmap()  # отрисовываемая картинка
         p = QPainter()  # отрисовщик
@@ -246,12 +258,14 @@ class MyWindow(QtWidgets.QMainWindow, design.Ui_MainWindow):
                     x += 1  # переходим с следующему пикселу сканирующей строки
 
                 # переходим к следующей сканирующей строке
+                cur_line += 1  # для отслеживания задержки
                 cur_y += 1
                 start_x += dx
 
                 # если выбрана опция "с задержкой",
-                if delay_flag:
+                if delay_flag and (cur_line == delay_lvl or cur_y == end_y):
                     self.make_delay(pix)
+                    cur_line = 0
 
         pix.convertFromImage(self.image)
         self.scene.addPixmap(pix)
