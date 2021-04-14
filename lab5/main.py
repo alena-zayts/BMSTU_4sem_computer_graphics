@@ -20,6 +20,12 @@ def find_color_code(color_name):
         return Qt.darkBlue
     elif color_name == 'Желтый':
         return Qt.yellow
+    elif color_name == 'Голубой':
+        return Qt.blue
+    elif color_name == 'Бирюзовый':
+        return Qt.cyan
+    elif color_name == 'Розовый':
+        return Qt.magenta
 
 
 # для добаления точки по нажатию мышкой

@@ -47,6 +47,21 @@
      </item>
      <item>
       <property name="text">
+       <string>Розовый</string>
+      </property>
+     </item>
+     <item>
+      <property name="text">
+       <string>Бирюзовый</string>
+      </property>
+     </item>
+     <item>
+      <property name="text">
+       <string>Голубой</string>
+      </property>
+     </item>
+     <item>
+      <property name="text">
        <string>Красный</string>
       </property>
      </item>
@@ -323,13 +338,13 @@
      <number>0</number>
     </property>
     <property name="maximum">
-     <number>10</number>
+     <number>30</number>
     </property>
     <property name="value">
-     <number>5</number>
+     <number>15</number>
     </property>
     <property name="sliderPosition">
-     <number>5</number>
+     <number>15</number>
     </property>
     <property name="orientation">
      <enum>Qt::Horizontal</enum>
