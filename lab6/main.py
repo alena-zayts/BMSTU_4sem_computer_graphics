@@ -90,6 +90,8 @@ class MyWindow(QtWidgets.QMainWindow, design.Ui_MainWindow):
         self.point_start = None
         self.point_prev = None
         self.image.fill(self.back_color)
+        self.fill_color = None
+        self.border_color = None
 
     # добавление затравочной точки по кнопке
     def on_bt_seed_clicked(self):
@@ -102,7 +104,7 @@ class MyWindow(QtWidgets.QMainWindow, design.Ui_MainWindow):
     def add_seedp(self, point):
         if self.seedp:
             self.handle_error('Ошибка', 'Уже введена затравочная точка с координатами'
-                                        ' (%.1f %.1f)'%(self.seedp.x(), self.seedp.y()))
+                                        ' (%d, %d)'%(self.seedp[0], self.seedp[1]))
             return
         self.seedp = [round(point.x()), round(point.y())]
         # добавление в таблицу
@@ -114,6 +116,8 @@ class MyWindow(QtWidgets.QMainWindow, design.Ui_MainWindow):
         self.table.setItem(i, 0, x)
         self.table.setItem(i, 1, y)
         self.table.setItem(i, 2, m)
+        # получаем цвет закраски только 1 раз!
+        self.get_fill_color()
 
     # добавление точки по нажатию кнопки
     def on_bt_add_clicked(self):
@@ -181,20 +185,19 @@ class MyWindow(QtWidgets.QMainWindow, design.Ui_MainWindow):
             self.handle_error('Ошибка', 'Введите затравочную точку.')
             return
 
-        self.get_fill_color()
         # self.draw_edges(self.edges)
+        ########## нужно ли
+        self.draw_edges([[0, 0, 1600, 0], [1600, 0, 1600, 1270], [1600, 1270, 0, 1270], [0, 1270, 0, 0]])
         self.fill_polygon()
 
     # настройка цвета заполнения
     def get_fill_color(self):
-        print("get_fill_color")
         color_name = self.box_color.currentText()
         color_code = find_color_code(color_name)
         self.fill_color = color_code
 
     # настройка цвета границы
     def get_border_color(self):
-        print("get_border_color")
         color_name = self.box_color_border.currentText()
         color_code = find_color_code(color_name)
         self.border_color = color_code
@@ -238,7 +241,7 @@ class MyWindow(QtWidgets.QMainWindow, design.Ui_MainWindow):
         delay_flag = self.but_delay.isChecked()
         if delay_flag:
             delay_lvl = self.delay_lvl.maximum() - self.delay_lvl.value() + 1
-        cur_line = 0  # для отслеживания задержки
+        cur_count = 0  # для отслеживания задержки
 
         t = QTime()
         pix = QPixmap()  # отрисовываемая картинка
@@ -252,7 +255,6 @@ class MyWindow(QtWidgets.QMainWindow, design.Ui_MainWindow):
         # пока стек не пуст
         while stack:
             point = stack.pop()
-            print(point)
             x, y = point[0], point[1]
 
             # заполняем интервал вправо от затравки (включая затравку)
@@ -278,21 +280,20 @@ class MyWindow(QtWidgets.QMainWindow, design.Ui_MainWindow):
                     # флаг перехождения затравки
                     flag = 0
                     # решаем проблему области в 1 пиксель шириной
-                    if x == xr:
-                        stack.append([x, y_])
+                    #if x == xr:
+                    #   stack.append([x, y_])
                     # ищем (хоть один или крайний правый) затравочный пиксель
-                    while ((self.get_color(x_cur, y_) != self.border_color) and
-                           (self.get_color(x_cur, y_) != self.fill_color) and
-                           (x < xr)):
-                        if not flag:
-                            flag = 1
+                    while ((self.get_color(x, y_) != self.border_color) and
+                           (self.get_color(x, y_) != self.fill_color) and
+                           (x <= xr)):###
+                        flag = 1
                         x += 1
                     # если такой нашелся, то помещаем его в стек
                     if flag:
                         # дошли до конца интервала
-                        if ((self.get_color(x_cur, y_) != self.border_color) and
-                           (self.get_color(x_cur, y_) != self.fill_color) and
-                                (x == xr)):
+                        if ((self.get_color(x, y_) != self.border_color) and
+                           (self.get_color(x, y_) != self.fill_color) and
+                           (x == xr)):
                             stack.append([x, y_])
                         # встретили границу или уже заполненную часть на интервале
                         else:
@@ -302,19 +303,20 @@ class MyWindow(QtWidgets.QMainWindow, design.Ui_MainWindow):
                     # запоминаем абсциссу текущего пиксела
                     xn = x
                     # flag = 0
-                    while (((self.get_color(x_cur, y_) == self.border_color) or
-                           (self.get_color(x_cur, y_) == self.fill_color)) and
+                    while (((self.get_color(x, y_) == self.border_color) or
+                           (self.get_color(x, y_) == self.fill_color)) and
                            (x < xr)):
                         x += 1
                     # убедимся, что координата абсциссы пикселя увеличилась (чтобы не зациклиться)
                     if x == xn:
                         x += 1
+            # если выбрана опция "с задержкой",
+            if delay_flag:
+                cur_count += 1
+                if cur_count == delay_lvl:
+                    self.make_delay(pix)
+                    cur_count = 0
 
-
-                # # если выбрана опция "с задержкой",
-                # if delay_flag and (cur_line == delay_lvl or cur_y == end_y):
-                #     self.make_delay(pix)
-                #     cur_line = 0
         pix.convertFromImage(self.image)
         self.scene.addPixmap(pix)
         p.end()
@@ -327,53 +329,3 @@ if __name__ == "__main__":
     w = MyWindow()  # Создаём объект класса ExampleApp
     w.show()  # Показываем окно
     sys.exit(app.exec_())  # и запускаем приложение
-
-
-# def fill(root):
-#     delay = root.modelst.get(root.modelst.curselection()[0])
-#     if delay == "С задержкой":
-#         delay = True
-#     else:
-#         delay = False
-#
-#     color = hex_to_dec(root.color)
-#
-#     while root.stack:
-#         point = root.stack.pop()
-#         root.image.put(root.color, (point[0], point[1]))
-#
-#         x, y = point[0] + 1, point[1]
-#         while root.image.get(x, y) != color:
-#             root.image.put(root.color, (x, y))
-#             x += 1
-#         rborder = x - 1
-#
-#         x = point[0] - 1
-#         while root.image.get(x, y) != color:
-#             root.image.put(root.color, (x, y))
-#             x -= 1
-#         lborder = x + 1
-#
-#         sign = [1, -1]
-#
-#         for i in sign:
-#             x = lborder
-#             y = point[1] + i
-#
-#             while x <= rborder:
-#                 is_exist = False
-#                 while root.image.get(x, y) != color and x <= rborder:
-#                     is_exist = True
-#                     x += 1
-#                 if is_exist:
-#                     root.stack.extend([[x - 1, y]])
-#                     is_exist = False
-#                 xi = x
-#                 while root.image.get(x, y) != color and x <= rborder:
-#                     x += 1
-#                 if x == xi:
-#                     x += 1
-#
-#         if delay:
-#             time.sleep(0.01)
-#             root.canvas.update()
