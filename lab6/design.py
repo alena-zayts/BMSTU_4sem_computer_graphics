@@ -153,7 +153,7 @@ class Ui_MainWindow(object):
 
     def retranslateUi(self, MainWindow):
         _translate = QtCore.QCoreApplication.translate
-        MainWindow.setWindowTitle(_translate("MainWindow", "Алгоритм заполнения \"по ребрам\""))
+        MainWindow.setWindowTitle(_translate("MainWindow", "Построчный алгоритм заполнения с затравкой"))
         self.groupBox.setTitle(_translate("MainWindow", "Цвет заполнения"))
         self.box_color.setItemText(0, _translate("MainWindow", "Зеленый"))
         self.box_color.setItemText(1, _translate("MainWindow", "Черный"))

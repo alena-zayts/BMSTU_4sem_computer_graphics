@@ -187,7 +187,7 @@ class MyWindow(QtWidgets.QMainWindow, design.Ui_MainWindow):
 
         # self.draw_edges(self.edges)
         ########## нужно ли
-        self.draw_edges([[0, 0, 1600, 0], [1600, 0, 1600, 1270], [1600, 1270, 0, 1270], [0, 1270, 0, 0]])
+        # self.draw_edges([[0, 0, 1600, 0], [1600, 0, 1600, 1270], [1600, 1270, 0, 1270], [0, 1270, 0, 0]])
         self.fill_polygon()
 
     # настройка цвета заполнения
@@ -254,11 +254,12 @@ class MyWindow(QtWidgets.QMainWindow, design.Ui_MainWindow):
 
         # пока стек не пуст
         while stack:
+            # извлекаем очередной затравочный пиксел
             point = stack.pop()
             x, y = point[0], point[1]
 
             # заполняем интервал вправо от затравки (включая затравку)
-            # и запоминаем крайний правый пиксель
+            # и запоминаем крайний правый пиксел
             x_cur = x
             while self.get_color(x_cur, y) != self.border_color:
                 self.set_color(x_cur, y, self.fill_color, p)
@@ -273,19 +274,15 @@ class MyWindow(QtWidgets.QMainWindow, design.Ui_MainWindow):
                 x_cur -= 1
             xl = x_cur + 1
             # Поиск новых затравочных пикселей в интервале xl <= x <= xr на двух соседних строках y+1, y-1
-            # Строка «ниже» текущей в экранной системе
             for y_ in [y + 1, y - 1]:
                 x = xl
                 while x <= xr:
                     # флаг перехождения затравки
                     flag = 0
-                    # решаем проблему области в 1 пиксель шириной
-                    #if x == xr:
-                    #   stack.append([x, y_])
                     # ищем (хоть один или крайний правый) затравочный пиксель
                     while ((self.get_color(x, y_) != self.border_color) and
                            (self.get_color(x, y_) != self.fill_color) and
-                           (x <= xr)):###
+                           (x <= xr)):                                                      ###
                         flag = 1
                         x += 1
                     # если такой нашелся, то помещаем его в стек

@@ -16,7 +16,7 @@
    </font>
   </property>
   <property name="windowTitle">
-   <string>Алгоритм заполнения &quot;по ребрам&quot;</string>
+   <string>Построчный алгоритм заполнения с затравкой</string>
   </property>
   <widget class="QWidget" name="centralwidget">
    <widget class="QGroupBox" name="groupBox">
