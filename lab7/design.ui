@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>2200</width>
-    <height>1400</height>
+    <height>1500</height>
    </rect>
   </property>
   <property name="font">
@@ -483,7 +483,7 @@
       <number>100</number>
      </property>
      <property name="value">
-      <number>300</number>
+      <number>600</number>
      </property>
     </widget>
     <widget class="QSpinBox" name="box_xr">
@@ -505,7 +505,7 @@
       <number>100</number>
      </property>
      <property name="value">
-      <number>600</number>
+      <number>1000</number>
      </property>
     </widget>
     <widget class="QLabel" name="label_7">
@@ -562,7 +562,7 @@
       <number>100</number>
      </property>
      <property name="value">
-      <number>600</number>
+      <number>700</number>
      </property>
     </widget>
     <widget class="QLabel" name="label_8">
@@ -617,10 +617,13 @@
       <number>6</number>
      </property>
      <property name="minimum">
-      <double>1.414214000000000</double>
+      <double>1.414213000000000</double>
      </property>
      <property name="maximum">
       <double>10099.989999999999782</double>
+     </property>
+     <property name="value">
+      <double>1.414213000000000</double>
      </property>
     </widget>
    </widget>
@@ -650,6 +653,54 @@
      <string>Очистить экран</string>
     </property>
    </widget>
+   <widget class="QGroupBox" name="groupBox_8">
+    <property name="geometry">
+     <rect>
+      <x>1760</x>
+      <y>1180</y>
+      <width>841</width>
+      <height>201</height>
+     </rect>
+    </property>
+    <property name="title">
+     <string>Введенный отскатель</string>
+    </property>
+    <widget class="QLabel" name="lbl_cutter">
+     <property name="geometry">
+      <rect>
+       <x>20</x>
+       <y>40</y>
+       <width>411</width>
+       <height>131</height>
+      </rect>
+     </property>
+     <property name="autoFillBackground">
+      <bool>false</bool>
+     </property>
+     <property name="text">
+      <string/>
+     </property>
+    </widget>
+   </widget>
+   <widget class="QLabel" name="label">
+    <property name="geometry">
+     <rect>
+      <x>20</x>
+      <y>1400</y>
+      <width>2161</width>
+      <height>51</height>
+     </rect>
+    </property>
+    <property name="font">
+     <font>
+      <pointsize>10</pointsize>
+     </font>
+    </property>
+    <property name="text">
+     <string>Левая кнопка мыши - ввод вершины отрезка; центральная - ввод вершины отрезка с выравниванием по горизонтали/вертикали; правая - ввод вершины отсекателя</string>
+    </property>
+   </widget>
+   <zorder>groupBox_8</zorder>
    <zorder>groupBox_4</zorder>
    <zorder>groupBox</zorder>
    <zorder>groupBox_3</zorder>
@@ -662,6 +713,7 @@
    <zorder>groupBox_7</zorder>
    <zorder>but_cut</zorder>
    <zorder>but_clean</zorder>
+   <zorder>label</zorder>
   </widget>
  </widget>
  <resources/>

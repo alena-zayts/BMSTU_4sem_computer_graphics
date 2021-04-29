@@ -57,7 +57,6 @@ class MyWindow(QtWidgets.QMainWindow, design.Ui_MainWindow):
         self.but_input_cutter.clicked.connect(self.on_bt_input_cutter_clicked)
         self.but_connect.clicked.connect(self.on_bt_connect_clicked)
         self.but_input_point.clicked.connect(self.on_bt_input_point_clicked)
-        #self.but_input_eps.clicked.connect(self.on_bt_input_eps_clicked)
         self.but_cut.clicked.connect(self.on_bt_cut_clicked)
 
         self.color_back = Qt.white
@@ -95,6 +94,7 @@ class MyWindow(QtWidgets.QMainWindow, design.Ui_MainWindow):
         self.scene.clear()
         self.table.clearContents()
         self.image.fill(self.color_back)
+        self.lbl_cutter.clear()
 
         self.color_back = Qt.white
         self.color_cutter = None
@@ -181,6 +181,7 @@ class MyWindow(QtWidgets.QMainWindow, design.Ui_MainWindow):
 
     # отрисовка исходных отрезков
     def draw_segments(self, segments):
+        self.get_color_segment()
         p = QPainter()
         p.begin(self.image)
         p.setPen(QPen(self.color_segment))
@@ -204,6 +205,7 @@ class MyWindow(QtWidgets.QMainWindow, design.Ui_MainWindow):
         self.cutter = [self.box_xl.value(), self.box_xr.value(),
                        self.box_yl.value(), self.box_yu.value()]
         self.draw_cutter(self.cutter)
+        self.print_cutter()
 
     # добавление вершины отсекателя
     def add_cutter_point(self, point):
@@ -221,6 +223,7 @@ class MyWindow(QtWidgets.QMainWindow, design.Ui_MainWindow):
             self.form_cutter()
             self.draw_cutter(self.cutter)
             self.cutter_start = None
+            self.print_cutter()
             return
         distance_x = abs(self.cutter_prev[0] - point[0])
         distance_y = abs(self.cutter_prev[1] - point[1])
@@ -262,8 +265,16 @@ class MyWindow(QtWidgets.QMainWindow, design.Ui_MainWindow):
                 yl = point[1]
         self.cutter = [xl, xr, yl, yu]
 
+    # вывод отсекателя в текстовое поле
+    def print_cutter(self):
+        text = "xл: %d    xп: %d\n" \
+               "yв: %d    yн: %d" % \
+               (self.cutter[0], self.cutter[1], self.cutter[3], self.cutter[2])
+        self.lbl_cutter.setText(text)
+
     # отрисовка части отсекателя
     def draw_cutter_part(self):
+        self.get_color_cutter()
         p = QPainter()
         p.begin(self.image)
         p.setPen(QPen(self.color_cutter))
@@ -279,6 +290,7 @@ class MyWindow(QtWidgets.QMainWindow, design.Ui_MainWindow):
 
     # отрисовка отсекателя
     def draw_cutter(self, cutter):
+        self.get_color_cutter()
         p = QPainter()
         p.begin(self.image)
         p.setPen(QPen(self.color_cutter))
@@ -304,10 +316,10 @@ class MyWindow(QtWidgets.QMainWindow, design.Ui_MainWindow):
 
     # рисование отрезка
     def my_darw_line(self, p, segment):
-        p.drawLine(*segment)
-        # points = bresenham_int(*segment)
-        # for point in points:
-        #     p.drawPoint(*point)
+        #p.drawLine(*segment)
+        points = bresenham_int(*segment)
+        for point in points:
+            p.drawPoint(*point)
 
     # отсечение
     def on_bt_cut_clicked(self):
@@ -317,10 +329,17 @@ class MyWindow(QtWidgets.QMainWindow, design.Ui_MainWindow):
         eps = self.box_eps.value()
         width = self.box_width.value()
         self.get_color_result()
+
+        if self.segment_prev:
+            self.segments.append([self.segment_prev[0], self.segment_prev[1],
+                                 self.segment_prev[0], self.segment_prev[1]])
+
         p = QPainter()
         p.begin(self.image)
+        p.fillRect(self.cutter[0] + 1, self.cutter[3] + 1,
+                   self.cutter[1] - self.cutter[0] - 2,
+                   self.cutter[2] - self.cutter[3] - 2, self.color_back)
         p.setPen(QPen(self.color_result, width))
-
         for segment in self.segments:
             p1 = [segment[0], segment[1]]
             p2 = [segment[2], segment[3]]
@@ -332,6 +351,7 @@ class MyWindow(QtWidgets.QMainWindow, design.Ui_MainWindow):
         pix = QPixmap()  # отрисовываемая картинка
         pix.convertFromImage(self.image)
         self.scene.addPixmap(pix)
+
 
 if __name__ == "__main__":
     app = QtWidgets.QApplication(sys.argv)  # Новый экземпляр QApplication
