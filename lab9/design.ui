@@ -16,7 +16,7 @@
    </font>
   </property>
   <property name="windowTitle">
-   <string>Алгоритм отсечения отрезка произвольным выпуклым отсекателем (Алгоритм Кируса—Бека)</string>
+   <string>Отсечение многоугольников. Алгоритм Сазерленда Ходжмена.</string>
   </property>
   <widget class="QWidget" name="centralwidget">
    <widget class="QGroupBox" name="groupBox">
@@ -202,11 +202,11 @@
       <x>20</x>
       <y>380</y>
       <width>441</width>
-      <height>241</height>
+      <height>171</height>
      </rect>
     </property>
     <property name="title">
-     <string>Цвет и толщина результата</string>
+     <string>Цвет результата</string>
     </property>
     <widget class="QComboBox" name="box_color_result">
      <property name="geometry">
@@ -258,47 +258,12 @@
       </property>
      </item>
     </widget>
-    <widget class="QLabel" name="label_10">
-     <property name="geometry">
-      <rect>
-       <x>20</x>
-       <y>160</y>
-       <width>181</width>
-       <height>41</height>
-      </rect>
-     </property>
-     <property name="text">
-      <string>Толщина:</string>
-     </property>
-    </widget>
-    <widget class="QSpinBox" name="box_width">
-     <property name="geometry">
-      <rect>
-       <x>240</x>
-       <y>160</y>
-       <width>111</width>
-       <height>41</height>
-      </rect>
-     </property>
-     <property name="minimum">
-      <number>1</number>
-     </property>
-     <property name="maximum">
-      <number>10000</number>
-     </property>
-     <property name="singleStep">
-      <number>1</number>
-     </property>
-     <property name="value">
-      <number>1</number>
-     </property>
-    </widget>
    </widget>
    <widget class="QPushButton" name="but_connect_cutter">
     <property name="geometry">
      <rect>
       <x>20</x>
-      <y>950</y>
+      <y>970</y>
       <width>441</width>
       <height>61</height>
      </rect>
@@ -311,7 +276,7 @@
     <property name="geometry">
      <rect>
       <x>20</x>
-      <y>1160</y>
+      <y>1200</y>
       <width>441</width>
       <height>61</height>
      </rect>
@@ -324,7 +289,7 @@
     <property name="geometry">
      <rect>
       <x>20</x>
-      <y>1240</y>
+      <y>1280</y>
       <width>441</width>
       <height>61</height>
      </rect>
@@ -336,7 +301,7 @@
    <widget class="QLabel" name="label">
     <property name="geometry">
      <rect>
-      <x>560</x>
+      <x>40</x>
       <y>1360</y>
       <width>2161</width>
       <height>111</height>
@@ -348,15 +313,15 @@
      </font>
     </property>
     <property name="text">
-     <string>Левая кнопка мыши - ввод вершины отсекаемого; правая - ввод вершины отсекателя. При вводе на холсте вершины отсекаемого, близкой к прямой, проходящей через ребро
- отсекателя, будет введена точка, лежащая на этой прямой.  </string>
+     <string>Левая кнопка мыши - ввод вершины отсекаемого; правая - ввод вершины отсекателя. При вводе на холсте вершины отсекаемого, близкой к прямой,
+ проходящей через ребро отсекателя, будет введена точка, лежащая на этой прямой.  </string>
     </property>
    </widget>
    <widget class="QGroupBox" name="groupBox_3">
     <property name="geometry">
      <rect>
       <x>20</x>
-      <y>720</y>
+      <y>680</y>
       <width>441</width>
       <height>211</height>
      </rect>
@@ -506,13 +471,29 @@
     <property name="geometry">
      <rect>
       <x>20</x>
-      <y>1030</y>
+      <y>1050</y>
       <width>441</width>
       <height>61</height>
      </rect>
     </property>
     <property name="text">
      <string>Замнкнуть отсекаемое</string>
+    </property>
+   </widget>
+   <widget class="QRadioButton" name="rb_delete">
+    <property name="geometry">
+     <rect>
+      <x>40</x>
+      <y>580</y>
+      <width>421</width>
+      <height>61</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>Удалять &quot;ложные&quot; ребра</string>
+    </property>
+    <property name="checked">
+     <bool>true</bool>
     </property>
    </widget>
    <zorder>groupBox_6</zorder>
@@ -529,6 +510,7 @@
    <zorder>groupBox_3</zorder>
    <zorder>table_cutter</zorder>
    <zorder>but_connect_segment</zorder>
+   <zorder>rb_delete</zorder>
   </widget>
  </widget>
  <resources/>

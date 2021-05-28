@@ -16,9 +16,9 @@ def vect_mult_sign_z(point1, point2, point3):
     x2 = point3[0] - point2[0]
     y2 = point3[1] - point2[1]
     z = x1 * y2 - y1 * x2
-    if z > 0:
+    if z > EPS:
         return 1
-    elif z < 0:
+    elif z < -EPS:
         return -1
     return 0
 
@@ -31,9 +31,9 @@ def scalar_mult(vec1, vec2):
 # знак скалярного произведения векторов vec1 и vec2
 def scalar_mult_sign(vec1, vec2):
     sm = scalar_mult(vec1, vec2)
-    if sm > 0:
+    if sm > EPS:
         return 1
-    elif sm < 0:
+    elif sm < -EPS:
         return -1
     return 0
 
@@ -86,7 +86,7 @@ def find_perp(dot, line):
 # с помощью скалярного произведения нормали и вектора от point1 до точки
 def is_visible(dot, point1, point2, point3):
     normal = inner_normal(point1, point2, point3)
-    vector = [dot[0]- point1[0], dot[1] - point1[1]]
+    vector = [dot[0] - point1[0], dot[1] - point1[1]]
     if scalar_mult_sign(normal, vector) >= 0:
         return True
     return False
@@ -118,13 +118,13 @@ def find_lines_intersection(line1, line2):
 # растояние от отчки dot до прямой, проходящей через точки point1 и point 2
 def dist_to_edge(dot, point1, point2):
     if (point1[0] == point2[0]) and (point1[1] == point2[1]):
-        dist = ((dot[0] - point1[0])**2 + (dot[1] - point1[1])**2) ** 0.5
+        dist = ((dot[0] - point1[0]) ** 2 + (dot[1] - point1[1]) ** 2) ** 0.5
         intersection = point1
     else:
         line = find_line_by_2points(point1, point2)
         perp = find_perp(dot, line)
         intersection = find_lines_intersection(line, perp)
-        dist = ((dot[0] - intersection[0])**2 + (dot[1] - intersection[1])**2) ** 0.5
+        dist = ((dot[0] - intersection[0]) ** 2 + (dot[1] - intersection[1]) ** 2) ** 0.5
     return dist, intersection
 
 
@@ -234,7 +234,11 @@ def prepare_poly(cutter):
 # (Алгоритм Сазерленда и Ходжмена)
 # np, p - количество и вершины отсекаемого
 # nc, c - отсекателя
-def sh_cut(p, c):
+# в конец массива вершин отсекателя повторно дописываются первая и вторая вершины
+# в конец массива вершин отсекаемого - первая вершина
+# возвращает массив ребер полученного в результате отсечения многоугольника
+# если установлен flag_delete, то ложные ребра удаляются
+def sh_cut(p, c, flag_delete):
     # проверка и подготовка отсекателя и отсекаемого
     rc, nc, c = prepare_cutter(c)
     if rc:
@@ -270,11 +274,48 @@ def sh_cut(p, c):
         # готовим исходный отсекаемый для следующего шага отсечения
         q.append(q[0])
         np, p = nq, deepcopy(q)
-        print(np, p)
 
-    return OK, p
-
-
+    result = make_edges(p, flag_delete)
+    return OK, result
 
 
+# создание списка ребер по вершинам многоугольника
+# если установлен flag_delete, то ложные ребра удаляются
+def make_edges(poly, flag_delete):
+    n = len(poly) - 1
+    result = set()
+    for i in range(n):
+        point_begin = min(poly[i], poly[i + 1])
+        point_end = max(poly[i], poly[i + 1])
+        list_of_intersections = []
 
+        if flag_delete:
+            for j in range(n):
+                if ((j < i) or (j > i + 1)) and check_fit(poly[j], point_begin, point_end):
+                    intersection = poly[j]
+                    if vect_mult_sign_z(point_begin, intersection, point_end) == 0:
+                        list_of_intersections.append(intersection)
+
+        if len(list_of_intersections) == 0:
+            new_edge = (point_begin[0], point_begin[1], point_end[0], point_end[1])
+            if new_edge in result:
+                result.discard(new_edge)
+            else:
+                result.add(new_edge)
+        else:
+            list_of_intersections.sort()
+            for intersection in list_of_intersections:
+                new_edge = (point_begin[0], point_begin[1], intersection[0], intersection[1])
+                if new_edge in result:
+                    result.discard(new_edge)
+                else:
+                    result.add(new_edge)
+                point_begin = intersection
+
+            new_edge = (point_begin[0], point_begin[1], point_end[0], point_end[1])
+            if new_edge in result:
+                result.discard(new_edge)
+            else:
+                result.add(new_edge)
+
+    return list(result)

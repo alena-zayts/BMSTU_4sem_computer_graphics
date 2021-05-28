@@ -1,7 +1,7 @@
 import design  # мой интерфейс
 from PyQt5 import QtWidgets
 from PyQt5.QtWidgets import QTableWidgetItem
-from PyQt5.QtGui import QPen, QImage, QPixmap, QPainter, QBrush, QPolygon
+from PyQt5.QtGui import QPen, QImage, QPixmap, QPainter, QBrush, QPolygon, QColor
 from PyQt5.QtCore import Qt, QPoint
 from sh_cut import *
 import sys
@@ -9,7 +9,7 @@ from copy import deepcopy
 
 global w
 
-MINDIST = 10
+MINDIST = 15
 
 
 # код цвета по названию
@@ -273,7 +273,7 @@ class MyWindow(QtWidgets.QMainWindow, design.Ui_MainWindow):
             self.handle_error("Ошибка", "Сначала введите отсекатель")
             return
         if (self.cutter_points[0][0] != self.cutter_points[-1][0]) or \
-            (self.cutter_points[0][1] != self.cutter_points[-1][1]):
+                (self.cutter_points[0][1] != self.cutter_points[-1][1]):
             self.handle_error("Ошибка", "Отсекатель не замкнут")
             return
 
@@ -281,11 +281,13 @@ class MyWindow(QtWidgets.QMainWindow, design.Ui_MainWindow):
             self.handle_error("Ошибка", "Сначала введите отсекаемое")
             return
         if (self.segment_points[0][0] != self.segment_points[-1][0]) or \
-            (self.segment_points[0][1] != self.segment_points[-1][1]):
+                (self.segment_points[0][1] != self.segment_points[-1][1]):
             self.handle_error("Ошибка", "Отсекаемое не замкнуто")
             return
 
-        width = self.box_width.value()
+        flag_delete = self.rb_delete.isChecked()
+        print('here')
+        width = 2
         self.get_color_result()
 
         self.my_repaint()
@@ -293,16 +295,13 @@ class MyWindow(QtWidgets.QMainWindow, design.Ui_MainWindow):
         p.begin(self.image)
         self.get_color_result()
         p.setPen(QPen(self.color_result, width))
-        rc, result = sh_cut(deepcopy(self.segment_points), deepcopy(self.cutter_points))
-        print(rc, result)
+        rc, result = sh_cut(deepcopy(self.segment_points), deepcopy(self.cutter_points), flag_delete)
         if rc == OK:
             self.my_help(p)
             p.setPen(QPen(self.color_result, width))
             if result:
-                result = list(map(round, result))
-                for i in range(len(result) - 1):
-                    self.my_darw_line(p, [result[i][0], result[i][1], result[i + 1][0], result[i + 1][1]])
-                self.my_darw_line(p, [result[0][0], result[0][1], result[-1][0], result[-1][1]])
+                for edge in result:
+                    self.my_darw_line(p, list(map(round, edge)))
         else:
             if rc == ERR_DEG:
                 self.handle_error("Ошибка", "Отсекатель вырожден")
