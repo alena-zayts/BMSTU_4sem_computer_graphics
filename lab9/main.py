@@ -286,7 +286,6 @@ class MyWindow(QtWidgets.QMainWindow, design.Ui_MainWindow):
             return
 
         flag_delete = self.rb_delete.isChecked()
-        print('here')
         width = 2
         self.get_color_result()
 
